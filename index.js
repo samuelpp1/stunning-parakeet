@@ -1,797 +1,169 @@
-// 立即执行函数，防止变量污染 (function() {})();
 
-// 柱状图模块1
-(function () {
-  // 1.实例化对象
-  var myChart = echarts.init(document.querySelector(".bar .chart"));
-  // 2.指定配置项和数据
-  var option = {
-    color: ['#2f89cf'],
-    // 提示框组件
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: { // 坐标轴指示器，坐标轴触发有效
-        type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
-      }
-    },
-    // 修改图表位置大小
-    grid: {
-      left: '0%',
-      top: '10px',
-      right: '0%',
-      bottom: '4%',
-      containLabel: true
-    },
-    // x轴相关配置
-    xAxis: [{
-      type: 'category',
-      data: ["Personal Identity", "Device Information", "Browsing History", "Location Data", "User Social Behavior", "User Content Data"],
-      axisTick: {
-        alignWithLabel: true
-      },
-      // 修改刻度标签，相关样式
-      axisLabel: {
-        color: "rgba(255,255,255,0.8)",
-        fontSize: 10
-      },
-      // x轴样式不显示
-      axisLine: {
-        show: false
-      }
-    }],
-    // y轴相关配置
-    yAxis: [{
-      type: 'value',
-      // 修改刻度标签，相关样式
-      axisLabel: {
-        color: "rgba(255,255,255,0.6)",
-        fontSize: 12
-      },
-      // y轴样式修改
-      axisLine: {
-        lineStyle: {
-          color: "rgba(255,255,255,0.6)",
-          width: 2
-        }
-      },
-      // y轴分割线的颜色
-      splitLine: {
-        lineStyle: {
-          color: "rgba(255,255,255,0.1)"
-        }
-      }
-    }],
-    // 系列列表配置
-    series: [{
-      name: 'direct access',
-      type: 'bar',
-      barWidth: '35%',
-      // ajax传动态数据
-      data: [200, 300, 300, 900, 1500, 1200, 600],
-      itemStyle: {
-        // 修改柱子圆角
-        barBorderRadius: 5
-      }
-    }]
-  };
-  // 3.把配置项给实例对象
-  myChart.setOption(option);
+//等页面所有DOM元素加载完毕在执行js代码,这样js文件就可以想放在哪里就放在哪里了
+window.addEventListener('load', function () {
 
-  // 4.让图表随屏幕自适应,图表随页面的变化而变化
-  window.addEventListener('resize', function () {
-    myChart.resize();
-  })
-})();
+    var up_page = document.querySelector('.up-page');
+    var next_page = document.querySelector('.next-page');
+    var focus = document.querySelector('.focus');
 
+    var focusWidth = focus.offsetWidth;   //获取轮播图容器的宽度，方便后续做算法移动图片
 
+    focus.addEventListener('mouseenter', function () {
+        up_page.style.display = 'block';
+        next_page.style.display = 'block';
+        clearInterval(index_timer);
+        index_timer = null;            //可写可不写，停止定时器后把变量删除，节省内存
+    })
 
+    focus.addEventListener('mouseleave', function () {
+        up_page.style.display = 'none';
+        next_page.style.display = 'none';
+        // 开启定时器，自动播放,已经声明过index_timer变量，这里不需要加var了
+        index_timer = setInterval(function () {
+            //手动调用点击事件
+            next_page.click();
+        }, 2500);
+    });
 
-// 柱状图模块2
-(function () {
-  // 1.实例化对象
-  var myChart = echarts.init(document.querySelector(".bar2 .chart"));
+    var focus_ul = document.querySelector('.focus_ul');    //ul 所有轮播图播放的图片
+    var focus_ol = document.querySelector('.circle');    //ol 底部的小圆点按钮
 
-  // 声明颜色数组
-  var myColor = ["#1089E7", "#F57474", "#56D0E3", "#F8B448", "#8B78F6"];
-  // 2.指定配置项和数据
-  var option = {
-    grid: {
-      top: "10%",
-      left: '22%',
-      bottom: '10%',
-      // containLabel: true
-    },
-    xAxis: {
-      // 不显示x轴相关信息
-      show: false
-    },
-    yAxis: [{
-      type: 'category',
-      // y轴数据反转，与数组的顺序一致
-      inverse: true,
-      // 不显示y轴线和刻度
-      axisLine: {
-        show: false
-      },
-      axisTick: {
-        show: false
-      },
-      // 将刻度标签文字设置为白色
-      axisLabel: {
-        color: "#fff"
-      },
-      data: ["Encryption Technology", "Authentication", "Data Minimization", "Privacy Statement Transparency", "User Clicks"]
-    }, {
-      // y轴数据反转，与数组的顺序一致
-      inverse: true,
-      show: false,
-      // 不显示y轴线和刻度
-      axisLine: {
-        show: false
-      },
-      axisTick: {
-        show: false
-      },
-      // 将刻度标签文字设置为白色
-      axisLabel: {
-        color: "#fff"
-      },
-      data: [702, 350, 610, 793, 664]
-    }],
-    series: [{
-        // 第一组柱子（条状）
-        name: '',
-        type: 'bar',
-        // 柱子之间的距离
-        barCategoryGap: 50,
-        // 柱子的宽度
-        barWidth: 10,
-        // 层级 相当于z-index
-        yAxisIndex: 0,
-        // 柱子更改样式
-        itemStyle: {
-          barBorderRadius: 20,
-          // 此时的color可以修改柱子的颜色
-          color: function (params) {
-            // params 传进来的是柱子的对象
-            // dataIndex 是当前柱子的索引号
-            // console.log(params);
-            return myColor[params.dataIndex];
-          }
-        },
-        data: [70, 34, 60, 78, 69],
-        // 显示柱子内的百分比文字
-        label: {
-          show: true,
-          position: "inside",
-          // {c} 会自动解析为数据（data内的数据）
-          formatter: "{c}%"
-        }
-      },
-      {
-        // 第二组柱子（框状 border）
-        name: '',
-        type: 'bar',
-        // 柱子之间的距离
-        barCategoryGap: 50,
-        // 柱子的宽度
-        barWidth: 14,
-        // 层级 相当于z-index
-        yAxisIndex: 1,
-        // 柱子修改样式
-        itemStyle: {
-          color: "none",
-          borderColor: "#00c1de",
-          borderWidth: 2,
-          barBorderRadius: 15,
-        },
-        data: [100, 100, 100, 100, 100]
-      }
-    ]
-  };
-  // 3.把配置项给实例对象
-  myChart.setOption(option);
+    // 动态创建小圆点,并添加点击事件
+    for (var i = 0; i < focus_ul.children.length; i++) {   //有几个图片我就创建几个li
+        //  循环创建节点（元素）li
+        var li = document.createElement('li');
+        // 依次添加到ol里
+        focus_ol.appendChild(li);
 
-  // 4.让图表随屏幕自适应
-  window.addEventListener('resize', function () {
-    myChart.resize();
-  })
-})();
+        // 再利用循环给每一个轮播图的li加一个自定义属性，后续通过获取索引号来控制轮播图移动
+        li.setAttribute('date_index', i);     //属性为date-index   属性值为0 1 2 3 4……
 
-// 折线图模块1
-(function () {
-  // 年份对应数据
-  var yearData = [{
-      year: "2020", // 年份
-      data: [
-        // 两个数组是因为有两条线
-        [24, 40, 101, 134, 90, 230],
-        
-      ]
-    },
-    {
-      year: "2021", // 年份
-      data: [
-        // 两个数组是因为有两条线
-        [123, 175, 112, 197, 121, 67, 98, 21, 43, 64, 76, 38],
-        
-      ]
+        // 再利用循环给每个li加入点击事件
+        li.addEventListener('click', function () {
+            // 排他思想，干掉其他人，留下我自己
+            for (var i = 0; i < focus_ol.children.length; i++) {
+                focus_ol.children[i].className = '';
+            }
+            this.className = 'current';
+
+            // 点击小圆圈，移动图片 当然移动的是 ul,ul是一个长盒子，里面装着所有图片，控制ul的left值来播放轮播图
+            // ul 的移动距离 小圆圈的索引号 乘以 图片的宽度 注意是负值
+            // 当我们点击了某个小li 就拿到当前小li 的索引号
+            var date_index = this.getAttribute('date_index');     //获取当前点击的li的索引号
+
+            // 当我们点击了某个小li 就要把这个li 的索引号给 num  
+            num = date_index;
+            // 当我们点击了某个小li 就要把这个li 的索引号给 circle  
+            circle = date_index;
+            // num = circle = index;
+
+            // 调用我们封装的动画函数,第一个参数为对象，谁移动就写谁，第二个参数是移动到目标值（数字），第三个参数是回调函数，可以写也可以不写
+            // ul 的移动距离 小圆圈的索引号 乘以 图片的宽度 注意是负值
+            animate(focus_ul, -date_index * focusWidth);
+        });
     }
-  ];
 
-  var myChart = echarts.init(document.querySelector(".line .chart"));
+    // 给第一个小圆点默认为白色背景
+    focus_ol.children[0].className = 'current';
+    // 在最后一张图片后面再克隆第一张图片，制作无缝滚动效果
+    var li = focus_ul.children[0].cloneNode(true);   //括号里为true，为深拷贝，复制标签以及里面的内容
+    // 克隆完毕后，把它排到最后一张图片的后面(默认就是排到最后的)
+    focus_ul.appendChild(li);
 
-  var option = {
-    // 修改两条线的颜色
-    color: ['#00f2f1', '#ed3f35'],
-    tooltip: {
-      trigger: 'axis'
-    },
-    // 图例组件
-    legend: {
-      // 当serise 有name值时， legend 不需要写data
-      // 修改图例组件文字颜色
-      textStyle: {
-        color: '#4c9bfd'
-      },
-      right: '10%',
-    },
-    grid: {
-      top: "20%",
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      containLabel: true,
-      show: true, // 显示边框
-      borderColor: '#012f4a' // 边框颜色
-    },
-    xAxis: {
-      type: 'category',
-      boundaryGap: false, // 去除轴间距
-      data: ['Data Theft', 'Platform Vulnerabilities', 'Third-Party Leaks', 'User Misoperation', 'Device Issues', 'Signal Leakage'],
-      // 去除刻度线
-      axisTick: {
-        show: false
-      },
-      axisLabel: {
-        color: "#4c9bfb" // x轴文本颜色
-      },
-      axisLine: {
-        show: false // 去除轴线
-      }
-    },
-    yAxis: {
-      type: 'value',
-      // 去除刻度线
-      axisTick: {
-        show: false
-      },
-      axisLabel: {
-        color: "#4c9bfb" // x轴文本颜色
-      },
-      axisLine: {
-        show: false // 去除轴线
-      },
-      splitLine: {
-        lineStyle: {
-          color: "#012f4a"
+
+    // 定义一个全局变量num,相当于小圆圈的索引号,点击右侧按钮控制图片移动
+    var num = 0;
+    // 定义一个全局变量circle控制小圆点跟着图片移动
+    var circle = 0;
+
+
+    // 节流阀
+    var flag = true;   //设置为全局变量供左右按钮点击函数使用，限制鼠标点击过快图片播放过快
+
+    // 右侧按钮点击切换图片
+    next_page.addEventListener('click', function () {
+
+        if (flag) {
+
+            flag = false;      //点击按钮后，就不让去继续点击了，等图片动画加载完之后利用回调函数再设置回true
+
+            // 减去克隆的那一张，到最后一张的时候就切回第一张图片从新开始
+            if (num == focus_ul.children.length - 1) {
+                focus_ul.style.left = 0;
+                num = 0;
+            }
+
+            num++;      //num相当与date_index
+
+            animate(focus_ul, -num * focusWidth, function () {
+                flag = true;       //回调函数：等图片动画加载完再回来执行这个函数
+            });
+
+            circle++;    //图片切到下一张了，底下的小圆点也要跟着到第二个
+
+            // 如果到了第四张图片就让小圆点从头开始
+            if (circle % 4 == 0) {
+                circle = 0;
+            }
+
+            // 排他思想
+            for (var i = 0; i < focus_ol.children.length; i++) {
+                focus_ol.children[i].className = '';
+            }
+            focus_ol.children[circle].className = 'current';
+
         }
-      }
-    },
-    series: [{
-        type: 'line',
-        smooth: true, // 圆滑的线
-        name: 'quantity',
-        data: yearData[0].data[0]
-      }
-    ]
-  };
 
-  myChart.setOption(option);
+    });
 
-  // 4.让图表随屏幕自适应
-  window.addEventListener('resize', function () {
-    myChart.resize();
-  })
 
-  // 5.点击切换2020 和 2021 的数据
-  $('.line h2').on('click','a', function () {
-    // console.log($(this).index());
-    // 点击a 之后 根据当前a的索引号 找到对应的 yearData 相关对象
-    // console.log(yearData[$(this).index()]);
-    var obj = yearData[$(this).index()];
-    option.series[0].data = obj.data[0];
-    option.series[1].data = obj.data[1];
-    // 选中年份高亮
-    // $('.line h2 a').removeClass('a-active');
-    // $(this).addClass('a-active');
+    // 左侧按钮点击切换图片
+    up_page.addEventListener('click', function () {
 
-    // 需要重新渲染
-    myChart.setOption(option);
-  })
- })();
+        if (flag) {
 
- 
-// 折线图模块2
-(function () {
-  var myChart = echarts.init(document.querySelector('.line2 .chart'));
+            flag = false;      //点击按钮后，就不让去继续点击了，等图片动画加载完之后利用回调函数再设置回true
 
-  var option = {
-    tooltip: {
-      trigger: 'axis',
-    },
-    legend: {
-      top: "0%",
-      textStyle: {
-        color: "rgba(255,255,255,.5)",
-        fontSize: "12"
-      }
-    },
-    grid: {
-      top: '3%',
-      left: '1%',
-      right: '3%',
-      bottom: '1%',
-      containLabel: true
-    },
-    xAxis: [{
-      type: 'category',
-      boundaryGap: false,
-      // 文本颜色为rgba(255,255,255,.6)  文字大小为 12
-      axisLabel: {
-        textStyle: { 
-          color: "rgba(255,255,255,.6)",
-          fontSize: 12
+            // 如果num等于第一张图片
+            if (num == 0) {
+                num = focus_ul.children.length - 1;          //切到第四张图片
+                focus_ul.style.left = -num * focusWidth + 'px';    //最后一张图,因为是向左走，所以得是负值
+                // 修改定位的top/left/right/bottom一定一定一定要加单位，js代码默认是没有单位的
+            }
+
+            // 上一张图片
+            num--;
+
+            // 上一个小圆点
+            circle--;
+
+            animate(focus_ul, -num * focusWidth, function () {
+                flag = true;              //  //回调函数：等图片动画加载完再回来执行这个函数
+            });
+
+            // 如果circle<0就说明是在第一张图片显示时，点击了左侧按钮，这时就要让小圆点跳到第四个点上
+            if (circle < 0) {
+                circle = focus_ol.children.length - 1;
+            }
+
+            for (var i = 0; i < focus_ol.children.length; i++) {
+                focus_ol.children[i].className = '';
+            }
+            focus_ol.children[circle].className = 'current';
+
         }
-      },
-      // x轴线的颜色为   rgba(255,255,255,.2)
-      axisLine: {
-        lineStyle: {
-          color: "rgba(255,255,255,.2)"
-        }
-      },
-      data: ["2019", "2020", "2021", "2022", "2023", "2024"]
-    }],
-    yAxis: [{
-      type: 'value',
-      axisTick: {
-        // 不显示刻度线
-        show: false
-      },
-      axisLine: {
-        lineStyle: {
-          color: "rgba(255,255,255,.1)"
-        }
-      },
-      axisLabel: {
-        textStyle: {
-          color: "rgba(255,255,255,.6)",
-          fontSize: 12
-        }
-      },
-      // 修改分割线的颜色
-      splitLine: {
-        lineStyle: {
-          color: "rgba(255,255,255,.1)"
-        }
-      }
-    }],
-    series: [{
-        name: 'Data Breach Quantity',
-        type: 'line',
-        smooth: true, // 圆滑的线
-        // 单独修改当前线条的样式
-        lineStyle: {
-          color: "#0184d5",
-          width: 2
-        },
-        // 填充区域渐变透明颜色
-        areaStyle: {
-          color: new echarts.graphic.LinearGradient(
-            0,
-            0,
-            0,
-            1,
-            [{
-                offset: 0,
-                color: "rgba(1, 132, 213, 0.4)" // 渐变色的起始颜色
-              },
-              {
-                offset: 0.8,
-                color: "rgba(1, 132, 213, 0.1)" // 渐变线的结束颜色
-              }
-            ],
-            false
-          ),
-          shadowColor: "rgba(0, 0, 0, 0.1)"
-        },
-        // 拐点设置为小圆点
-        symbol: 'circle',
-        // 设置拐点大小
-        symbolSize: 5,
-        // 开始不显示拐点， 鼠标经过显示
-        showSymbol: false,
-        // 设置拐点颜色以及边框
-        itemStyle: {
-          color: "#0184d5",
-          borderColor: "rgba(221, 220, 107, .1)",
-          borderWidth: 12
-        },
-        data: [30, 40, 30, 40, 30, 40,]
-      },
-      {
-        name: "Forwarding Volume",
-        type: "line",
-        smooth: true,
-        lineStyle: {
-          normal: {
-            color: "#00d887",
-            width: 2
-          }
-        },
-        areaStyle: {
-          normal: {
-            color: new echarts.graphic.LinearGradient(
-              0,
-              0,
-              0,
-              1,
-              [{
-                  offset: 0,
-                  color: "rgba(0, 216, 135, 0.4)"
-                },
-                {
-                  offset: 0.8,
-                  color: "rgba(0, 216, 135, 0.1)"
-                }
-              ],
-              false
-            ),
-            shadowColor: "rgba(0, 0, 0, 0.1)"
-          }
-        },
-        // 设置拐点 小圆点
-        symbol: "circle",
-        // 拐点大小
-        symbolSize: 5,
-        // 设置拐点颜色以及边框
-        itemStyle: {
-          color: "#00d887",
-          borderColor: "rgba(221, 220, 107, .1)",
-          borderWidth: 12
-        },
-        // 开始不显示拐点， 鼠标经过显示
-        showSymbol: false,
-        data: [130, 10, 20, 40, 30, 40]
-      }
-    ]
-  };
 
-  myChart.setOption(option);
-
-  window.addEventListener('resize', function () {
-    myChart.resize();
-
-  })
-
-
-
-})();
-
-// 饼形图1
-(function () {
-  var myChart = echarts.init(document.querySelector(".pie .chart"));
-  var option = {
-    color: ["#1089E7", "#F57474", "#56D0E3", "#F8B448", "#8B78F6"],
-    tooltip: {
-      trigger: 'item',
-      formatter: '{a} <br/>{b}: {c} ({d}%)'
-    },
-    legend: {
-      // 垂直居中,默认水平居中
-      // orient: 'vertical',
-
-      bottom: 0,
-      left: 10,
-      // 小图标的宽度和高度
-      itemWidth: 10,
-      itemHeight: 10,
-      // 修改图例组件的文字为 12px
-      textStyle: {
-        color: "rgba(255,255,255,.5)",
-        fontSize: "10"
-      }
-    },
-    series: [{
-      name: 'Age Distribution',
-      type: 'pie',
-      // 设置饼形图在容器中的位置
-      center: ["50%", "42%"],
-      // 修改饼形图大小，第一个为内圆半径，第二个为外圆半径
-      radius: ['40%', '60%'],
-      avoidLabelOverlap: false,
-      // 图形上的文字
-      label: {
-        show: false,
-        position: 'center'
-      },
-      // 链接文字和图形的线
-      labelLine: {
-        show: false
-      },
-      data: [{
-        value: 40,
-        name: "Very Concerned"
-      },
-      {
-        value: 30,
-        name: "Somewhat Concerned"
-      },
-      {
-        value: 20,
-        name: "Not Very Concerned"
-      },
-      {
-        value: 10,
-        name: "Not Concerned at All"
-      },
-      {
-        value: 10,
-        name: "Unknown"
-      }
-    ]
-
-    }]
-  };
-
-  myChart.setOption(option);
-  window.addEventListener('resize', function () {
-    myChart.resize();
-  })
-})();
-
-// 饼形图2
-(function () {
-  var myChart = echarts.init(document.querySelector('.pie2 .chart'));
-  var option = {
-    color: ['#60cda0', '#ed8884', '#ff9f7f', '#0096ff', '#9fe6b8', '#32c5e9', '#1d9dff'],
-    tooltip: {
-      trigger: 'item',
-      formatter: '{a} <br/>{b} : {c} ({d}%)'
-    },
-    legend: {
-      bottom: 0,
-      itemWidth: 10,
-      itemHeight: 10,
-      textStyle: {
-        color: "rgba(255,255,255,.5)",
-        fontSize: 10
-      }
-    },
-    series: [{
-      name: 'Regional Distribution',
-      type: 'pie',
-      radius: ["10%", "60%"],
-      center: ['50%', '40%'],
-      // 半径模式  area面积模式
-      roseType: 'radius',
-      // 图形的文字标签
-      label: {
-        fontsize: 10
-      },
-      // 引导线调整
-      labelLine: {
-        // 连接扇形图线长(斜线)
-        length: 6,
-        // 连接文字线长(横线)
-        length2: 8
-      },
-      data: [{
-          value: 26,
-          name: 'beijing'
-        },
-        {
-          value: 24,
-          name: 'shandong'
-        },
-        {
-          value: 25,
-          name: 'hebei'
-        },
-        {
-          value: 20,
-          name: 'jiangsu'
-        },
-        {
-          value: 25,
-          name: 'zhejiang'
-        },
-        {
-          value: 30,
-          name: 'sichuan'
-        },
-        {
-          value: 42,
-          name: 'hubei'
-        }
-      ]
-    }]
-  };
-
-  myChart.setOption(option);
-  window.addEventListener('resize', function () {
-    myChart.resize();
-  })
-})();
-
-(function () {
-  var myChart = echarts.init(document.querySelector('.map .chart1'));
-
-  var option = {
-    tooltip: {
-      trigger: 'axis',
-    },
-    legend: {
-      top: "0%",
-      textStyle: {
-        color: "rgba(255,255,255,.5)",
-        fontSize: "12"
-      }
-    },
-    grid: {
-      top: '3%',
-      left: '1%',
-      right: '3%',
-      bottom: '1%',
-      containLabel: true
-    },
-    xAxis: [{
-      type: 'category',
-      boundaryGap: false,
-      // 文本颜色为rgba(255,255,255,.6)  文字大小为 12
-      axisLabel: {
-        textStyle: { 
-          color: "rgba(255,255,255,.6)",
-          fontSize: 12
-        }
-      },
-      // x轴线的颜色为   rgba(255,255,255,.2)
-      axisLine: {
-        lineStyle: {
-          color: "rgba(255,255,255,.2)"
-        }
-      },
-      data: ["18-24", "25-30", "31-35", "36-40", "41-45", "46-50","51-55","56-60","61-65","66-70","71-75","76"]
-    }],
-    yAxis: [{
-      type: 'value',
-      axisTick: {
-        // 不显示刻度线
-        show: false
-      },
-      axisLine: {
-        lineStyle: {
-          color: "rgba(255,255,255,.1)"
-        }
-      },
-      axisLabel: {
-        textStyle: {
-          color: "rgba(255,255,255,.6)",
-          fontSize: 12
-        }
-      },
-      // 修改分割线的颜色
-      splitLine: {
-        lineStyle: {
-          color: "rgba(255,255,255,.1)"
-        }
-      }
-    }],
-    series: [{
-        name: 'Privacy Concern Level',
-        type: 'line',
-        smooth: true, // 圆滑的线
-        // 单独修改当前线条的样式
-        lineStyle: {
-          color: "#0184d5",
-          width: 2
-        },
-        // 填充区域渐变透明颜色
-        areaStyle: {
-          color: new echarts.graphic.LinearGradient(
-            0,
-            0,
-            0,
-            1,
-            [{
-                offset: 0,
-                color: "rgba(1, 132, 213, 0.4)" // 渐变色的起始颜色
-              },
-              {
-                offset: 0.8,
-                color: "rgba(1, 132, 213, 0.1)" // 渐变线的结束颜色
-              }
-            ],
-            false
-          ),
-          shadowColor: "rgba(0, 0, 0, 0.1)"
-        },
-        // 拐点设置为小圆点
-        symbol: 'circle',
-        // 设置拐点大小
-        symbolSize: 5,
-        // 开始不显示拐点， 鼠标经过显示
-        showSymbol: false,
-        // 设置拐点颜色以及边框
-        itemStyle: {
-          color: "#0184d5",
-          borderColor: "rgba(221, 220, 107, .1)",
-          borderWidth: 12
-        },
-        data: [30, 40, 30, 40, 30, 40,80,90,50,30,20,16]
-      },
-      {
-        name: "Data Consent Rate",
-        type: "line",
-        smooth: true,
-        lineStyle: {
-          normal: {
-            color: "#00d887",
-            width: 2
-          }
-        },
-        areaStyle: {
-          normal: {
-            color: new echarts.graphic.LinearGradient(
-              0,
-              0,
-              0,
-              1,
-              [{
-                  offset: 0,
-                  color: "rgba(0, 216, 135, 0.4)"
-                },
-                {
-                  offset: 0.8,
-                  color: "rgba(0, 216, 135, 0.1)"
-                }
-              ],
-              false
-            ),
-            shadowColor: "rgba(0, 0, 0, 0.1)"
-          }
-        },
-        // 设置拐点 小圆点
-        symbol: "circle",
-        // 拐点大小
-        symbolSize: 5,
-        // 设置拐点颜色以及边框
-        itemStyle: {
-          color: "#00d887",
-          borderColor: "rgba(221, 220, 107, .1)",
-          borderWidth: 12
-        },
-        // 开始不显示拐点， 鼠标经过显示
-        showSymbol: false,
-        data: [60, 10, 20, 40, 30, 40,50,30,80,90,30,50]
-      }
-    ]
-  };
-
-  myChart.setOption(option);
-
-  window.addEventListener('resize', function () {
-    myChart.resize();
-
-  })
-
-
-
-})();
+    });
 
 
 
 
 
+    // 开启定时器，自动播放
+    var index_timer = setInterval(function () {
+        //手动调用点击事件
+        next_page.click();
+    }, 2500);
 
 
+});
